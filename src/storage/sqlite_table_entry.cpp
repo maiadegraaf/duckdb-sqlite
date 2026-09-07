@@ -2,6 +2,7 @@
 #include "storage/sqlite_table_entry.hpp"
 #include "storage/sqlite_transaction.hpp"
 #include "duckdb/storage/statistics/base_statistics.hpp"
+#include "duckdb/parser/parsed_data/create_table_info.hpp"
 #include "sqlite_scanner.hpp"
 #include "duckdb/storage/table_storage_info.hpp"
 
@@ -9,7 +10,11 @@ namespace duckdb {
 
 SQLiteTableEntry::SQLiteTableEntry(Catalog &catalog, SchemaCatalogEntry &schema, CreateTableInfo &info,
                                    bool all_varchar)
-    : TableCatalogEntry(catalog, schema, info), all_varchar(all_varchar) {
+    : TableCatalogEntry(catalog, schema, info), all_varchar(all_varchar), columns(std::move(info.columns)) {
+}
+
+const ColumnList &SQLiteTableEntry::GetColumns() const {
+	return columns;
 }
 
 unique_ptr<BaseStatistics> SQLiteTableEntry::GetStatistics(ClientContext &context, column_t column_id) {
